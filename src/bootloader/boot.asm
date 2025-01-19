@@ -24,7 +24,7 @@ print_string:
 .done:
     ret
 
-msg: db 'Hello, World!', 0
+msg: db 'Booting...', 0
 
 times 510 - ($ - $$) db 0	;fill the rest of sector with 0
 dw 0xAA55			;add boot signature at the end of bootloader    
