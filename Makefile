@@ -37,16 +37,23 @@ $(KERNEL): $(KERNEL_DIR)/kernel.asm $(KERNEL_DIR)/kernel.c
 
 # Create OS image
 $(OS_IMAGE): $(BOOTLOADER) $(KERNEL)
+	# Create a disk image big enough for bootloader and kernel (2880 * 512 = 1.44MB floppy)
 	dd if=/dev/zero of=$@ bs=512 count=2880
+	# Copy the bootloader to the first sector
 	dd if=$(BOOTLOADER) of=$@ conv=notrunc
+	# Copy the kernel starting from the second sector
 	dd if=$(KERNEL) of=$@ bs=512 seek=1 conv=notrunc
 
 # Run the OS in QEMU
 run: $(OS_IMAGE)
-	qemu-system-i386 -drive format=raw,file=$(OS_IMAGE)
+	qemu-system-i386 -fda $(OS_IMAGE) -boot a
+
+# Run with debug options
+debug: $(OS_IMAGE)
+	qemu-system-i386 -fda $(OS_IMAGE) -boot a -monitor stdio -d int,cpu_reset
 
 # Clean build files
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean run 
+.PHONY: all clean run debug 

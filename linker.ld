@@ -2,24 +2,32 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 1M;
+    /* Set the output address to 0x1000 */
+    . = 0x1000;
 
-    .text BLOCK(4K) : ALIGN(4K)
+    /* First put the multiboot header, as it must be within the first 8K */
+    .text ALIGN(4K) : 
     {
+        /* Ensure that _start is at the beginning of the section */
+        *(.text.start)
+        *(.text._start)
         *(.text)
     }
 
-    .rodata BLOCK(4K) : ALIGN(4K)
+    /* Read-only data */
+    .rodata ALIGN(4K) : 
     {
         *(.rodata)
     }
 
-    .data BLOCK(4K) : ALIGN(4K)
+    /* Read-write data (initialized) */
+    .data ALIGN(4K) : 
     {
         *(.data)
     }
 
-    .bss BLOCK(4K) : ALIGN(4K)
+    /* Read-write data (uninitialized) and stack */
+    .bss ALIGN(4K) : 
     {
         *(COMMON)
         *(.bss)
