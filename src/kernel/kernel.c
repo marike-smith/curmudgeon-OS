@@ -39,6 +39,24 @@ void debug_write_at(int x, int y, const char* str, uint8_t fg, uint8_t bg) {
     }
 }
 
+// Function to calculate string length
+size_t strlen(const char* str) {
+    size_t len = 0;
+    while (str[len] != '\0') {
+        len++;
+    }
+    return len;
+}
+
+// Function to write text centered on a specific row
+void write_centered(int y, const char* str, uint8_t fg, uint8_t bg) {
+    size_t len = strlen(str);
+    int x = (VGA_WIDTH - len) / 2; // Calculate center position
+    if (x < 0) x = 0; // Safety check
+    
+    debug_write_at(x, y, str, fg, bg);
+}
+
 // Kernel modules
 void init_memory(void);
 void init_interrupts(void);
@@ -50,44 +68,13 @@ void kernel_main(void) {
     for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++) {
         VGA_MEM[i] = (uint16_t)' ' | ((uint16_t)(VGA_COLOR_BLACK << 4) << 8);
     }
-     
-    // DEBUG: Write test patterns with different colors to diagnose display issues
-    debug_write_at(0, 0, "CURMUDGEON OS v0.1", VGA_COLOR_WHITE, VGA_COLOR_BLUE);
     
-    // Line 2 - white text on black background
-    debug_write_at(0, 2, "WHITE ON BLACK", VGA_COLOR_WHITE, VGA_COLOR_BLACK);
+    int center_y = VGA_HEIGHT / 2;
+    char mem_buf[32] = "CURMUDGEON OS v0.1";
     
-    // Line 4 - yellow text on red background 
-    debug_write_at(0, 4, "YELLOW ON RED", VGA_COLOR_LIGHT_BROWN, VGA_COLOR_RED);
+    // Center the memory message vertically and horizontally
+    write_centered(center_y, mem_buf, VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
     
-    // Line 6 - green text on black
-    debug_write_at(0, 6, "GREEN ON BLACK", VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK);
-    
-    // Line 8 - simple character pattern to verify character rendering
-    debug_write_at(0, 8, "0123456789ABCDEF!@#$%^&*()", VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK);
-    
-    // Line 10 - simple memory test
-    uint32_t* test_addr = (uint32_t*)0x100000;
-    char mem_buf[32];
-    
-    for (int i = 0; i < 32; i++) {
-        mem_buf[i] = ' ';
-    }
-    
-    mem_buf[0] = 'M';
-    mem_buf[1] = 'E';
-    mem_buf[2] = 'M';
-    mem_buf[3] = 'O';
-    mem_buf[4] = 'R';
-    mem_buf[5] = 'Y';
-    mem_buf[6] = ' ';
-    mem_buf[7] = 'T';
-    mem_buf[8] = 'E';
-    mem_buf[9] = 'S';
-    mem_buf[10] = 'T';
-    mem_buf[11] = '\0';
-    
-    debug_write_at(0, 10, mem_buf, VGA_COLOR_LIGHT_RED, VGA_COLOR_BLACK);
     
     // Main kernel loop
     while(1) {
