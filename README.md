@@ -1,8 +1,4 @@
- To run the bootloader, ensure you have qemu installed: 
- 
- Linux: `sudo apt-get install qemu`  
- Windows: `choco install qemu`  
- Mac: `brew install qemu`  
+ Run ./setup_toolchain.sh to install dependencies 
  
  Then run `make run` from the root directory.
 
